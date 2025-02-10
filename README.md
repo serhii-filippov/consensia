@@ -10,14 +10,14 @@ This service manages customer loyalty points for an e-commerce platform. It prov
 
 ## Setup
 1. Clone the repository.
-2. Run `docker-compose up -d` to start MongoDB.
-3. Run `npm install` to install dependencies.
-4. Run `npm start` to start the server.
+2. Run `npm install` to install dependencies.
+3. Run `docker-compose up --build && docker-compose up -d` to start MongoDB container.
+4. Run `npm run dev` to start the server in dev mode.
 
 ## Endpoints
-- **POST /webhook**: Handle loyalty program events.
-- **GET /:customerId/points**: Get loyalty points for a customer.
-- **POST /:customerId/consume**: Consume loyalty points for a customer.
+- **POST /webhook**: Handle loyalty program events. **PUBLIC**
+- **GET /:customerId/points**: Get loyalty points for a customer. **AUTH** required
+- **POST /:customerId/consume**: Consume loyalty points for a customer. **AUTH** required
 
 ## Testing
 Run tests with:
