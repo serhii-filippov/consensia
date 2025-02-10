@@ -1,5 +1,10 @@
 import { connect, disconnect } from 'mongoose';
-import { getCustomerPoints, addCustomerPoints, consumeCustomerPoints, handleCustomerCreated } from '../repositories/loyaltyRepository';
+import {
+  getCustomerPoints,
+  addCustomerPoints,
+  consumeCustomerPoints,
+  handleCustomerCreated,
+} from '../repositories/loyaltyRepository';
 import CustomerPoints from '../models/customerPoints';
 
 beforeAll(async () => {

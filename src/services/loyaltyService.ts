@@ -6,6 +6,14 @@ import {
   getCustomerPoints,
   consumeCustomerPoints,
 } from '../repositories/loyaltyRepository';
+import {
+  handleOrderCreation as insertOrder,
+} from '../repositories/ordersRepository';
+import {
+  deleteOrder,
+  getCustomerOrders,
+  handleCustomerDeletion,
+} from '../repositories/ordersRepository';
 import logger from '../utils/logger';
 
 /**
@@ -21,9 +29,11 @@ export const processEvent = async (
       break;
     case 'CustomerDeleted':
       await handleCustomerDeleted(event.Payload);
+      await handleCustomerDeletion(event.Payload);
       break;
     case 'OrderPlaced':
       await handleOrderCreation(event.Payload);
+      await insertOrder(event.Payload);
       break;
     case 'OrderReturned':
       await subtractPointsOrderReturnCancellation(event.Payload);
@@ -73,13 +83,22 @@ export const consumePointsForCustomer = async (
  * @returns The new number of loyalty points.
  */
 export const subtractPointsOrderReturnCancellation = async (
-  payload: {customerId: string, points: number},
+  payload: {OrderId: string, points: number},
 ): Promise<number> => {
-  const { customerId, points } = payload;
+  const { OrderId } = payload;
+  const customerOrders = await getCustomerOrders(OrderId)
+  // We good simply return over here since customer does not have any orders
+  const customerId = customerOrders[0]?.customerId;
+  if (!customerId) {
+    return 0
+  }
+  const points = customerOrders[0].points || 0;
+
   const currentPointsBalance = await getCustomerPoints(customerId);
   if (currentPointsBalance < points) {
     throw new Error('Insufficient points balance');
   }
 
+  await deleteOrder(OrderId);
   return consumeCustomerPoints(customerId, points);
 };

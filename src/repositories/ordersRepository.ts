@@ -8,7 +8,7 @@ import Orders,
  * @param OrderId - The ID of the order.
  * @returns The number of loyalty points.
  */
-export const getCustomerByOrderId = async (
+export const getCustomerOrders = async (
     OrderId: string,
 ): Promise<IOrders[]> => {
   const customerOrders = await Orders.find({ orderId: OrderId }).exec();

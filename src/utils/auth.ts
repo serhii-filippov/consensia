@@ -23,7 +23,6 @@ export const generateToken = (customerId: string): string => {
 
 /**
  * Middleware to authenticate requests using JWT.
-export const authenticate = (req: AuthenticatedRequest, res: Response, next: NextFunction): void => {
  * @param res - The Express response object.
  * @param next - The next middleware function.
  */

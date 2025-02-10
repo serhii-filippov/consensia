@@ -5,6 +5,10 @@ import {
     getCustomerPoints,
     consumeCustomerPoints,
 } from './controllers/loyaltyController';
+import {
+  authenticate,
+  generateToken,
+} from './utils/auth';
 import logger from './utils/logger';
 import { config } from './config';
 import cleanUpExpiredPointsCron from './cron-jobs/cleanUpExpiredPoints';
@@ -12,7 +16,6 @@ import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 dotenv.config();
 
-import { authenticate } from './utils/auth';
 
 const app = express();
 const port = config.port;
@@ -37,12 +40,14 @@ mongoose.connection.on('error', (err) => {
 
 app.listen(port, () => {
   logger.info(`Server running on http://localhost:${port}`);
+  // dummy, for testing purposes
+  console.log('here\'s your JWT: ', generateToken('testCustomerId123'));
 });
 
 app.use(bodyParser.json());
 app.post('/webhook', webhook);
-app.get('/:customerId/points', getCustomerPoints);
-app.post('/:customerId/consume', consumeCustomerPoints);
+app.get('/:customerId/points', authenticate ,getCustomerPoints);
+app.post('/:customerId/consume', authenticate, consumeCustomerPoints);
 
 process.on('unhandledRejection', (reason, promise) => {
   console.error('Unhandled Rejection occurred at:', promise, '\nreason:', reason);
