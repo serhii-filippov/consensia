@@ -7,9 +7,12 @@ import {
 } from './controllers/loyaltyController';
 import logger from './utils/logger';
 import { config } from './config';
+import cleanUpExpiredPointsCron from './cron-jobs/cleanUpExpiredPoints';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 dotenv.config();
+
+import { authenticate } from './utils/auth';
 
 const app = express();
 const port = config.port;
@@ -46,3 +49,7 @@ process.on('unhandledRejection', (reason, promise) => {
 process.on('uncaughtException', (error) => {
   console.error('Uncaught Exception occurred:', error);
 });
+
+// Start the cron job to clean up expired points
+cleanUpExpiredPointsCron.start();
+logger.info('Cron job started to expire loyalty points.');

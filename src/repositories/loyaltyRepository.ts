@@ -61,7 +61,7 @@ export const handleCustomerCreated = async (
 export const handleCustomerDeleted = async (
   payload: { CustomerId: string }
 ): Promise<void> => {
-  await CustomerPoints.deleteMany({ customerId: payload.CustomerId }).exec();
+  await CustomerPoints.deleteOne({ customerId: payload.CustomerId }).exec();
 };
 
 /**

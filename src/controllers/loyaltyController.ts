@@ -22,16 +22,16 @@ export const webhook = (req: AuthenticatedRequest, res: Response): void => {
 
   // don't wait for the event to be processed by intent
   processEvent(req.body);
-  res.status(200).send('Event processed');
+  res.status(202).send('Event accepted');
 };
 
-export const getCustomerPoints = (req: AuthenticatedRequest, res: Response): void => {
+export const getCustomerPoints = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   const customerId = req.params.customerId;
-  const points = getPointsForCustomer(customerId);
+  const points = await getPointsForCustomer(customerId);
   res.status(200).json({ points });
 };
 
-export const consumeCustomerPoints = (req: AuthenticatedRequest, res: Response): void => {
+export const consumeCustomerPoints = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   const { error } = validateConsumePoints(req.body);
   if (error) {
     logger.error(`Validation error: ${error.details[0].message}`);
@@ -40,8 +40,13 @@ export const consumeCustomerPoints = (req: AuthenticatedRequest, res: Response):
     return
   }
 
-  const customerId = req.params.CustomerId;
+  const customerId = req.params.customerId;
   const points = req.body.points;
-  const newPoints = consumePointsForCustomer(customerId, points);
-  res.status(200).json({ points: newPoints });
+  try {
+    const newPoints = await consumePointsForCustomer(customerId, points);
+    res.status(200).json({ points: newPoints });
+  } catch (e: any | unknown) {
+    logger.error(`Customer: ${customerId} has Error consuming points: ${e.message}`);
+    res.status(400).json({ error: e.message });
+  }
 };

@@ -43,7 +43,7 @@ export const processEvent = async (event: Event): Promise<void> => {
  * @returns The number of loyalty points.
  */
 export const getPointsForCustomer = async (customerId: string): Promise<number> => {
-  return await getCustomerPoints(customerId);
+  return getCustomerPoints(customerId);
 };
 
 /**
@@ -53,5 +53,10 @@ export const getPointsForCustomer = async (customerId: string): Promise<number> 
  * @returns The new number of loyalty points.
  */
 export const consumePointsForCustomer = async (customerId: string, points: number): Promise<number> => {
-  return await consumeCustomerPoints(customerId, points);
+  const currentPointsBalance = await getCustomerPoints(customerId);
+  if (currentPointsBalance < points) {
+    throw new Error('Insufficient points balance');
+  }
+
+  return consumeCustomerPoints(customerId, points);
 };
