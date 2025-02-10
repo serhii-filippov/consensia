@@ -26,7 +26,7 @@ export const webhook = (req: AuthenticatedRequest, res: Response): void => {
 };
 
 export const getCustomerPoints = (req: AuthenticatedRequest, res: Response): void => {
-  const customerId = req.params.CustomerId;
+  const customerId = req.params.customerId;
   const points = getPointsForCustomer(customerId);
   res.status(200).json({ points });
 };

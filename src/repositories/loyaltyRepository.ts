@@ -69,9 +69,9 @@ export const handleCustomerDeleted = async (
  * @param payload - The payload of the order placed event.
  */
 export const handleOrderCreation = async (
-  payload: { CustomerId: string; totalAmount: number; OrderId: string }
+  payload: { CustomerId: string; TotalOrderAmount: number; OrderId: string }
 ): Promise<void> => {
-  const pointsEarned = Math.floor(payload.totalAmount / 50);
+  const pointsEarned = Math.floor(payload.TotalOrderAmount / 50);
   await addCustomerPoints(payload.CustomerId, pointsEarned);
 };
 

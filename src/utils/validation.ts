@@ -13,6 +13,8 @@ export const validateEvent = (payload: any): Joi.ValidationResult => {
     Sequence: Joi.number().required(),
     Payload: Joi.object({
       CustomerId: Joi.string().required(),
+      OrderId: Joi.string(),
+      TotalOrderAmount: Joi.number().positive(),
     }).required(),
   });
 
