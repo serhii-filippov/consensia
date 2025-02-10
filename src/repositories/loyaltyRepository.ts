@@ -1,5 +1,4 @@
 import CustomerPoints from '../models/customerPoints';
-import logger from '../utils/logger';
 
 /**
  * Get loyalty points for a customer.
@@ -73,26 +72,4 @@ export const handleOrderCreation = async (
 ): Promise<void> => {
   const pointsEarned = Math.floor(payload.TotalOrderAmount / 50);
   await addCustomerPoints(payload.CustomerId, pointsEarned);
-};
-
-/**
- * Handle order returned event.
- * @param payload - The payload of the order returned event.
- */
-export const handleOrderReturned = async (
-  payload: { CustomerId: string }
-): Promise<void> => {
-  // Logic to handle order return, but since reviewer didn't provide the logic
-  // I'm leaving it empty presuming that order return should not affect the points balance
-  logger.warn(`Order returned for customer ${payload.CustomerId}. Dummy. Points deduction logic not implemented.`)
-};
-
-/**
- * Handle order canceled event.
- * @param payload - The payload of the order canceled event.
- */
-export const handleOrderCanceled = async (
-  payload: { CustomerId: string }
-): Promise<void> => {
-  // TODO: add logic to handle order canceled
 };

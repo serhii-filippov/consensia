@@ -3,8 +3,6 @@ import {
   handleCustomerCreated,
   handleCustomerDeleted,
   handleOrderCreation,
-  handleOrderReturned,
-  handleOrderCanceled,
   getCustomerPoints,
   consumeCustomerPoints,
 } from '../repositories/loyaltyRepository';
@@ -14,7 +12,9 @@ import logger from '../utils/logger';
  * Process an incoming event.
  * @param event - The event to process.
  */
-export const processEvent = async (event: Event): Promise<void> => {
+export const processEvent = async (
+  event: Event,
+): Promise<void> => {
   switch (event.EventName) {
     case 'CustomerCreated':
       await handleCustomerCreated(event.Payload);
@@ -26,10 +26,10 @@ export const processEvent = async (event: Event): Promise<void> => {
       await handleOrderCreation(event.Payload);
       break;
     case 'OrderReturned':
-      await handleOrderReturned(event.Payload);
+      await subtractPointsOrderReturnCancellation(event.Payload);
       break;
     case 'OrderCanceled':
-      await handleOrderCanceled(event.Payload);
+      await subtractPointsOrderReturnCancellation(event.Payload);
       break;
     default:
       logger.warn(`Unknown event type: ${event.EventName}`);
@@ -42,7 +42,9 @@ export const processEvent = async (event: Event): Promise<void> => {
  * @param customerId - The ID of the customer.
  * @returns The number of loyalty points.
  */
-export const getPointsForCustomer = async (customerId: string): Promise<number> => {
+export const getPointsForCustomer = async (
+  customerId: string
+): Promise<number> => {
   return getCustomerPoints(customerId);
 };
 
@@ -52,7 +54,28 @@ export const getPointsForCustomer = async (customerId: string): Promise<number> 
  * @param points - The number of points to consume.
  * @returns The new number of loyalty points.
  */
-export const consumePointsForCustomer = async (customerId: string, points: number): Promise<number> => {
+export const consumePointsForCustomer = async (
+  customerId: string,
+  points: number
+): Promise<number> => {
+  const currentPointsBalance = await getCustomerPoints(customerId);
+  if (currentPointsBalance < points) {
+    throw new Error('Insufficient points balance');
+  }
+
+  return consumeCustomerPoints(customerId, points);
+};
+
+/**
+ * Subtract loyalty points by the returned or canceled order.
+ * @param customerId - The ID of the customer.
+ * @param points - The number of points to consume.
+ * @returns The new number of loyalty points.
+ */
+export const subtractPointsOrderReturnCancellation = async (
+  payload: {customerId: string, points: number},
+): Promise<number> => {
+  const { customerId, points } = payload;
   const currentPointsBalance = await getCustomerPoints(customerId);
   if (currentPointsBalance < points) {
     throw new Error('Insufficient points balance');

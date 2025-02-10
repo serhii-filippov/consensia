@@ -27,6 +27,8 @@ mongoose.connect(config.db.uri, {
 
 mongoose.connection.on('connected', () => {
   logger.info('Connected to MongoDB');
+  cleanUpExpiredPointsCron.start();
+  logger.info('Cron job started to expire loyalty points.');
 });
 
 mongoose.connection.on('error', (err) => {
@@ -49,7 +51,3 @@ process.on('unhandledRejection', (reason, promise) => {
 process.on('uncaughtException', (error) => {
   console.error('Uncaught Exception occurred:', error);
 });
-
-// Start the cron job to clean up expired points
-cleanUpExpiredPointsCron.start();
-logger.info('Cron job started to expire loyalty points.');
